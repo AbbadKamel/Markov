@@ -22,3 +22,21 @@ sequence with injected anomalies:
 The implementation lives under ``src/`` and comprises a small parser, feature
 engineering helpers, a detector combining Markov transitions with range and
 correlation checks, and traffic simulation utilities.
+
+Modeling choices in ``demo_nmea2000.py``
+---------------------------------------
+
+The NMEA 2000 demo configures a simple first-order Markov chain with the
+following conventions:
+
+* **State space** – Each message is mapped to a discrete state derived from its
+  PGN and binned values such as RPM or speed.
+* **Transition matrix** – Consecutive states are counted for every PGN, then
+  Laplace smoothing (add-one) is applied and the counts are normalised to form
+  transition probabilities.
+* **Initial distribution** – Transition tables start uniformly, which
+  corresponds to an uninformed prior on the first observation.
+* **Markov property** – The detector assumes the next state depends only on the
+  current state, ignoring earlier history.
+* **Stationary distribution** – No stationary distribution is computed; the
+  model focuses on transition likelihoods for anomaly detection.
